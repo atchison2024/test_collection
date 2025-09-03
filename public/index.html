@@ -25,27 +25,33 @@
         timestamp: new Date().toISOString()
       };
 
-      fetch("https://your-backend-endpoint/api/save", {
+      fetch("http://localhost:3000/api/save", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data)
       })
-      .then(res => res.ok ? alert("Submitted!") : alert("Error submitting."))
+      .then(res => {
+        if (res.ok) {
+          alert("Submitted successfully!");
+        } else {
+          alert("Error submitting form.");
+        }
+      })
       .catch(err => alert("Network error: " + err));
     }
   </script>
 </head>
 <body>
   <div id="password-section">
-    <input type="password" id="password" placeholder="Enter password"/>
+    <input type="password" id="password" placeholder="Enter password" />
     <button onclick="checkPassword()">Enter</button>
   </div>
 
   <div id="form-container" style="display:none;">
-    <h2>Information Form</h2>
-    <input type="text" id="name" placeholder="Name"><br>
-    <input type="number" id="age" placeholder="Age"><br>
-    <input type="text" id="hobby" placeholder="Hobby"><br>
+    <h2>User Information</h2>
+    <input type="text" id="name" placeholder="Name"><br><br>
+    <input type="number" id="age" placeholder="Age"><br><br>
+    <input type="text" id="hobby" placeholder="Hobby"><br><br>
     <button onclick="submitForm()">Submit</button>
   </div>
 </body>
