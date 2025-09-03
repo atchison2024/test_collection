@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Secure Form</title>
+  <script>
+    function checkPassword() {
+      const password = document.getElementById("password").value;
+      if (password === "123456") {
+        document.getElementById("form-container").style.display = "block";
+        document.getElementById("password-section").style.display = "none";
+      } else {
+        alert("Incorrect password.");
+      }
+    }
+
+    function submitForm() {
+      const name = document.getElementById("name").value;
+      const age = document.getElementById("age").value;
+      const hobby = document.getElementById("hobby").value;
+
+      const data = {
+        name,
+        age,
+        hobby,
+        timestamp: new Date().toISOString()
+      };
+
+      fetch("https://your-backend-endpoint/api/save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      })
+      .then(res => res.ok ? alert("Submitted!") : alert("Error submitting."))
+      .catch(err => alert("Network error: " + err));
+    }
+  </script>
+</head>
+<body>
+  <div id="password-section">
+    <input type="password" id="password" placeholder="Enter password"/>
+    <button onclick="checkPassword()">Enter</button>
+  </div>
+
+  <div id="form-container" style="display:none;">
+    <h2>Information Form</h2>
+    <input type="text" id="name" placeholder="Name"><br>
+    <input type="number" id="age" placeholder="Age"><br>
+    <input type="text" id="hobby" placeholder="Hobby"><br>
+    <button onclick="submitForm()">Submit</button>
+  </div>
+</body>
+</html>
