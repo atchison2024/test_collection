@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Data Collection</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: #2c3e50;
+            color: white;
+            padding: 25px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+        
+        .header p {
+            opacity: 0.8;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        input {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+        
+        button {
+            width: 100%;
+            padding: 15px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        button:hover {
+            background: #2980b9;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .message {
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: center;
+            font-weight: 500;
+        }
+        
+        .error {
+            background: #ffecec;
+            color: #e74c3c;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .success {
+            background: #e6ffed;
+            color: #2ecc71;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin-top: 25px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .github-info {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+        
+        .github-info a {
+            color: #3498db;
+            text-decoration: none;
+        }
+        
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #7f8c8d;
+        }
+        
+        .password-container {
+            position: relative;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                border-radius: 10px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-lock"></i> Secure Data Portal</h1>
+            <p>Enter password to access content</p>
+        </div>
+        
+        <div class="content">
+            <!-- Login Section -->
+            <div id="login-section">
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="password-container">
+                        <input type="password" id="password" placeholder="Enter your password">
+                        <span class="password-toggle" id="password-toggle">
+                            <i class="far fa-eye"></i>
+                        </span>
+                    </div>
+                </div>
+                <button id="login-btn">
+                    <i class="fas fa-sign-in-alt"></i> Access Content
+                </button>
+                <div id="login-error" class="message error hidden">
+                    <i class="fas fa-exclamation-circle"></i> Incorrect password. Please try again.
+                </div>
+            </div>
+
+            <!-- Content Section (Initially Hidden) -->
+            <div id="content-section" class="hidden">
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <input type="text" id="name" placeholder="Enter your full name">
+                </div>
+                <div class="form-group">
+                    <label for="age">Age</label>
+                    <input type="number" id="age" placeholder="Enter your age" min="1" max="120">
+                </div>
+                <button id="submit-btn">
+                    <i class="fas fa-paper-plane"></i> Submit Information
+                </button>
+                <div id="success-msg" class="message success hidden">
+                    <i class="fas fa-check-circle"></i> Data saved successfully and uploaded to GitHub!
+                </div>
+                <div id="error-msg" class="message error hidden">
+                    <i class="fas fa-exclamation-circle"></i> Please fill all fields correctly.
+                </div>
+                
+                <div class="info-box">
+                    <p><i class="fas fa-info-circle"></i> Your data will be saved to a CSV file and uploaded to the GitHub repository.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="github-info">
+            <p>This form demonstrates data collection with GitHub integration</p>
+        </div>
+    </div>
+
+    <script>
+        // Predefined password (in a real application, this would be handled server-side)
+        const CORRECT_PASSWORD = "github123";
+        
+        // DOM Elements
+        const loginSection = document.getElementById('login-section');
+        const contentSection = document.getElementById('content-section');
+        const passwordInput = document.getElementById('password');
+        const passwordToggle = document.getElementById('password-toggle');
+        const loginBtn = document.getElementById('login-btn');
+        const loginError = document.getElementById('login-error');
+        const nameInput = document.getElementById('name');
+        const ageInput = document.getElementById('age');
+        const submitBtn = document.getElementById('submit-btn');
+        const successMsg = document.getElementById('success-msg');
+        const errorMsg = document.getElementById('error-msg');
+        
+        // Toggle password visibility
+        passwordToggle.addEventListener('click', () => {
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                passwordToggle.innerHTML = '<i class="far fa-eye-slash"></i>';
+            } else {
+                passwordInput.type = 'password';
+                passwordToggle.innerHTML = '<i class="far fa-eye"></i>';
+            }
+        });
+        
+        // Login functionality
+        loginBtn.addEventListener('click', () => {
+            if (passwordInput.value === CORRECT_PASSWORD) {
+                loginSection.classList.add('hidden');
+                contentSection.classList.remove('hidden');
+                loginError.classList.add('hidden');
+            } else {
+                loginError.classList.remove('hidden');
+                passwordInput.focus();
+            }
+        });
+        
+        // Form submission
+        submitBtn.addEventListener('click', () => {
+            const name = nameInput.value.trim();
+            const age = ageInput.value.trim();
+            
+            if (name && age && !isNaN(age) && age > 0 && age < 120) {
+                // Create CSV content
+                const csvContent = `Name,Age,Timestamp\n"${name}",${age},"${new Date().toISOString()}"`;
+                
+                // Create a downloadable file
+                const blob = new Blob([csvContent], { type: 'text/csv' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `user-data-${Date.now()}.csv`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                // Show success message
+                successMsg.classList.remove('hidden');
+                errorMsg.classList.add('hidden');
+                
+                // Reset form
+                nameInput.value = '';
+                ageInput.value = '';
+                
+                // Simulate GitHub upload (in a real implementation, this would use GitHub API)
+                simulateGitHubUpload(csvContent);
+                
+            } else {
+                errorMsg.classList.remove('hidden');
+                successMsg.classList.add('hidden');
+            }
+        });
+        
+        // Simulate GitHub upload function
+        async function uploadToGitHub(csvContent) {
+            // GitHub API详细信息
+            const username = 'Atchison2024';
+            const repo = 'test_collection';
+            const filePath = 'data.csv';
+            const token = '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';
+            
+            // API URL
+            const apiUrl = `https://api.github.com/repos/${username}/${repo}/contents/${filePath}`;
+            
+            // 准备请求数据
+            const content = btoa(unescape(encodeURIComponent(csvContent)));
+            
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `token ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: 'Add user data via web form',
+                        content: content
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    console.log('File uploaded successfully:', result);
+                    return true;
+                } else {
+                    console.error('Error uploading file:', result);
+                    return false;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                return false;
+            }
+        }
+        
+        // Allow login on pressing Enter in password field
+        passwordInput.addEventListener('keyup', (event) => {
+            if (event.key === 'Enter') {
+                loginBtn.click();
+            }
+        });
+        
+        // Allow form submission on pressing Enter in age field
+        ageInput.addEventListener('keyup', (event) => {
+            if (event.key === 'Enter') {
+                submitBtn.click();
+            }
+        });
+        
+        // Focus on password input when page loads
+        window.onload = () => {
+            passwordInput.focus();
+        };
+    </script>
+</body>
+</html>
