@@ -8,7 +8,7 @@ import requests
 from datetime import datetime
 
 # Replace with your values
-GITHUB_TOKEN = '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'
+GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN")
 REPO_OWNER = 'atchison2024'
 REPO_NAME = 'test_collection'
 FILE_PATH = 'submissions.csv'  # relative path in the repo
