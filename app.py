@@ -3,6 +3,54 @@ from dash import html, dcc, Input, Output, State
 import pandas as pd
 import os
 
+import base64
+import requests
+from datetime import datetime
+
+# Replace with your values
+GITHUB_TOKEN = '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'
+REPO_OWNER = 'atchison2024'
+REPO_NAME = 'test_collection'
+FILE_PATH = 'submissions.csv'  # relative path in the repo
+BRANCH = 'main'
+
+def push_csv_to_github(csv_path_local):
+    with open(csv_path_local, 'rb') as f:
+        content = f.read()
+        encoded_content = base64.b64encode(content).decode('utf-8')
+
+    # Get SHA if file exists (needed for update)
+    url = f'https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/contents/{FILE_PATH}'
+    headers = {
+        'Authorization': f'token {GITHUB_TOKEN}',
+        'Accept': 'application/vnd.github+json',
+    }
+
+    response = requests.get(url, headers=headers)
+    if response.status_code == 200:
+        sha = response.json()['sha']
+    else:
+        sha = None
+
+    commit_message = f"Update submissions.csv at {datetime.utcnow().isoformat()}"
+
+    data = {
+        'message': commit_message,
+        'content': encoded_content,
+        'branch': BRANCH,
+    }
+
+    if sha:
+        data['sha'] = sha  # needed if updating
+
+    response = requests.put(url, headers=headers, json=data)
+
+    if response.status_code in [200, 201]:
+        print("✅ File successfully pushed to GitHub.")
+    else:
+        print(f"❌ Failed to push file: {response.status_code}")
+        print(response.json())
+
 # Initialize the app
 app = dash.Dash(__name__)
 server = app.server  # For deployment
@@ -79,6 +127,8 @@ def submit_form(n_clicks, name, age, hobby):
         new_data.to_csv(file_path, mode='a', header=False, index=False)
     else:
         new_data.to_csv(file_path, index=False)
+        
+    push_csv_to_github("submissions.csv")
     
     return "Information submitted successfully."
 
