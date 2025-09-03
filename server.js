@@ -1,17 +1,24 @@
-// server.js
 const express = require('express');
 const bodyParser = require('body-parser');
-const { Octokit } = require("@octokit/rest");
+const cors = require('cors');
+const { Octokit } = require('@octokit/rest');
 
 const app = express();
+const PORT = 3000;
+
+// Middleware
+app.use(cors());
 app.use(bodyParser.json());
+app.use(express.static('public'));
 
-const octokit = new Octokit({ auth: "YOUR_GITHUB_TOKEN" });
-const owner = "your-github-username";
-const repo = "your-repo-name";
+// GitHub config
+const octokit = new Octokit({ auth: "YOUR_GITHUB_PERSONAL_ACCESS_TOKEN" });
+const owner = "YOUR_GITHUB_USERNAME";
+const repo = "YOUR_REPO_NAME";
 
-app.post("/api/save", async (req, res) => {
+app.post('/api/save', async (req, res) => {
   const { name, age, hobby, timestamp } = req.body;
+
   const content = `Name: ${name}\nAge: ${age}\nHobby: ${hobby}\nTime: ${timestamp}`;
   const path = `submissions/${Date.now()}.txt`;
 
@@ -20,7 +27,7 @@ app.post("/api/save", async (req, res) => {
       owner,
       repo,
       path,
-      message: `New submission from ${name}`,
+      message: `Form submission: ${name}`,
       content: Buffer.from(content).toString('base64'),
       committer: {
         name: "Form Bot",
@@ -31,11 +38,13 @@ app.post("/api/save", async (req, res) => {
         email: "form-bot@example.com"
       }
     });
-    res.status(200).send("Saved to GitHub.");
+    res.status(200).send("Saved successfully.");
   } catch (err) {
     console.error(err);
-    res.status(500).send("GitHub error");
+    res.status(500).send("Error saving to GitHub.");
   }
 });
 
-app.listen(3000, () => console.log("Server running on port 3000"));
+app.listen(PORT, () => {
+  console.log(`🚀 Server running at http://localhost:${PORT}`);
+});
