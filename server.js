@@ -1,50 +1,40 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const cors = require('cors');
-const { Octokit } = require('@octokit/rest');
-
+const express = require("express");
+const fetch = require("node-fetch");
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
-// Middleware
-app.use(cors());
-app.use(bodyParser.json());
-app.use(express.static('public'));
+app.use(express.json());
 
-// GitHub config
-const octokit = new Octokit({ auth: "YOUR_GITHUB_PERSONAL_ACCESS_TOKEN" });
-const owner = "YOUR_GITHUB_USERNAME";
-const repo = "YOUR_REPO_NAME";
+app.post("/api/submit", async (req, res) => {
+  const { name, email } = req.body;
 
-app.post('/api/save', async (req, res) => {
-  const { name, age, hobby, timestamp } = req.body;
+  const content = {
+    name,
+    email,
+    timestamp: new Date().toISOString()
+  };
 
-  const content = `Name: ${name}\nAge: ${age}\nHobby: ${hobby}\nTime: ${timestamp}`;
-  const path = `submissions/${Date.now()}.txt`;
+  const fileContent = Buffer.from(JSON.stringify(content, null, 2)).toString("base64");
 
-  try {
-    await octokit.repos.createOrUpdateFileContents({
-      owner,
-      repo,
-      path,
-      message: `Form submission: ${name}`,
-      content: Buffer.from(content).toString('base64'),
-      committer: {
-        name: "Form Bot",
-        email: "form-bot@example.com"
-      },
-      author: {
-        name: "Form Bot",
-        email: "form-bot@example.com"
-      }
-    });
-    res.status(200).send("Saved successfully.");
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Error saving to GitHub.");
+  const response = await fetch("https://api.github.com/repos/YOUR_USERNAME/YOUR_REPO/contents/data/" + `${Date.now()}.json`, {
+    method: "PUT",
+    headers: {
+      "Authorization": `token ${process.env.GITHUB_TOKEN}`,
+      "Accept": "application/vnd.github.v3+json"
+    },
+    body: JSON.stringify({
+      message: "New form submission",
+      content: fileContent,
+      branch: "main"
+    })
+  });
+
+  if (response.ok) {
+    res.json({ message: "Submitted successfully!" });
+  } else {
+    const error = await response.json();
+    res.status(500).json({ message: "GitHub API error", error });
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`🚀 Server running at http://localhost:${PORT}`);
-});
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
