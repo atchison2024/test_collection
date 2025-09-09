@@ -3,7 +3,7 @@ from dash import dcc, html, Input, Output, State, ctx
 import dash_bootstrap_components as dbc
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
-server = app.server
+#server = app.server
 
 # General Questions Section
 def general_info():
@@ -367,6 +367,43 @@ def show_arbitrage_question(lvr):
     return html.Div()
 
 
+# Upload Documents Section
+def upload_documents():
+    return dbc.Card([
+        dbc.CardHeader("Additional Documents"),
+        dbc.CardBody([
+            dbc.Label("Upload any additional documents (optional)"),
+            dcc.Upload(
+                id="upload-docs",
+                children=html.Div(['Drag and Drop or ', html.A('Select Files')]),
+                style={
+                    'width': '100%',
+                    'height': '60px',
+                    'lineHeight': '60px',
+                    'borderWidth': '1px',
+                    'borderStyle': 'dashed',
+                    'borderRadius': '5px',
+                    'textAlign': 'center',
+                    'marginTop': '10px'
+                },
+                multiple=True
+            ),
+            html.Ul(id='uploaded-files', className='mt-3')
+        ])
+    ], className="mb-4")
+
+# Show uploaded files
+@app.callback(
+    Output("uploaded-files", "children"),
+    Input("upload-docs", "filename"),
+    State("uploaded-files", "children")
+)
+def update_uploaded_list(filenames, current_list):
+    if filenames is None:
+        return []
+    return [html.Li(f) for f in filenames]
+
+
 # Success and Error Modals
 success_modal = dbc.Modal([
     dbc.ModalHeader("Submission Status"),
@@ -385,7 +422,6 @@ error_modal = dbc.Modal([
 ], id="error-modal", is_open=False)
 
 
-
 # App Layout
 app.layout = dbc.Container([
     dbc.Row([
@@ -396,6 +432,7 @@ app.layout = dbc.Container([
             property_characteristics(),
             loan_purpose(),
             credit_structure(),
+            upload_documents(),
             dbc.Button("Submit", id="submit-button", color="primary", className="mt-3"),
             success_modal,
             error_modal
